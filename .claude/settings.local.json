@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp ~/.claude/skills/ldc-deploy/SKILL.md ~/.claude/skills/ldc-deploy/SKILL.md.bak)",
+      "Bash(cp /Users/zhaoxin/code/ledu/bfe-tech/deploy/skills/ldc-deploy/SKILL.md ~/.claude/skills/ldc-deploy/SKILL.md)",
+      "Bash(cp /Users/zhaoxin/code/ledu/bfe-tech/deploy/commands/*.md ~/.claude/commands/)",
+      "Read(//Users/zhaoxin/.claude/commands/**)",
+      "Read(//Users/zhaoxin/.claude/skills/**)"
+    ]
+  }
+}

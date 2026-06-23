@@ -1,0 +1,15 @@
+{
+  "name": "bfe-ledu-deploy",
+  "description": "BFE Ledu 部署工具集",
+  "owner": {
+    "name": "bfe-ledu",
+    "email": "p_zhaoxin10@ledupeiyou.com"
+  },
+  "plugins": [
+    {
+      "name": "ldc-deploy",
+      "description": "未来云一键部署 — 通过 ldc CLI 完成构建、发布、审批、回滚",
+      "path": "."
+    }
+  ]
+}
