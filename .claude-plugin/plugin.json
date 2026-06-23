@@ -1,0 +1,10 @@
+{
+  "name": "ldc-deploy",
+  "description": "未来云一键部署 — 通过 ldc CLI 完成构建、发布、审批、回滚",
+  "version": "1.0.0",
+  "author": { "name": "bfe-ledu", "email": "p_zhaoxin10@ledupeiyou.com" },
+  "homepage": "https://github.com/bfe-ledu/deploy",
+  "repository": "https://github.com/bfe-ledu/deploy",
+  "license": "MIT",
+  "keywords": ["cloud", "deploy", "ldc", "ship", "build", "review", "rollback"]
+}
