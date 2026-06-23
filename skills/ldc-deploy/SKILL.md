@@ -1,6 +1,7 @@
 ---
 name: ldc-deploy
 description: 通过 ledu-cloud-cli (ldc) 进行项目构建和部署。支持测试环境和生产环境的一键 ship、build、deploy、rollback、review 操作。
+disable-model-invocation: true
 metadata:
   author: bfe-ledu
   version: "1.0"

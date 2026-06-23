@@ -1,6 +1,7 @@
 ---
 name: "Rollback"
 description: 回滚到已发布版本的上一版本
+disable-model-invocation: true
 category: Deploy
 tags: [deploy, rollback, ldc]
 ---

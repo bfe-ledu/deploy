@@ -1,6 +1,7 @@
 ---
 name: "Init"
 description: 初始化项目的 .claude/deploy.json 部署配置
+disable-model-invocation: true
 category: Deploy
 tags: [deploy, init, config, ldc]
 ---

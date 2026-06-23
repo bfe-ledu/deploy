@@ -1,6 +1,7 @@
 ---
 name: "Build"
 description: 仅构建项目（打包），不提交发布申请
+disable-model-invocation: true
 category: Deploy
 tags: [deploy, build, ldc]
 ---

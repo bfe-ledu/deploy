@@ -1,6 +1,7 @@
 ---
 name: "Review"
 description: 批量审批项目发布和团队申请
+disable-model-invocation: true
 category: Deploy
 tags: [deploy, review, approve, ldc]
 ---

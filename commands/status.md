@@ -1,6 +1,7 @@
 ---
 name: "Status"
 description: 查看项目部署状态和最近发布记录
+disable-model-invocation: true
 category: Deploy
 tags: [deploy, status, ldc]
 ---

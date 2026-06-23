@@ -1,6 +1,7 @@
 ---
 name: "Ship"
 description: 一键构建并发布项目到未来云（测试/生产环境）
+disable-model-invocation: true
 category: Deploy
 tags: [deploy, build, ship, ldc]
 ---

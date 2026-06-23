@@ -1,6 +1,7 @@
 ---
 name: "Whoami"
 description: 查看当前 ldc 登录用户信息
+disable-model-invocation: true
 category: Deploy
 tags: [deploy, whoami, ldc, auth]
 ---
