@@ -80,9 +80,22 @@ metadata:
 2. 未指定 → `AskUserQuestion`：选择 `test` 或 `prod`
 3. 环境为 `prod` 时 → 必须 `AskUserQuestion` 二次确认
 
+### QR PNG 登录模式
+
+用于 login 命令，生成 PNG 二维码供 Read 工具内联显示：
+
+1. `Bash: node <plugin-dir>/scripts/qr-login.mjs`（timeout: 150000）
+2. 解析 stdout 中的 `STATUS:` 和 `QR_PNG:` 行
+3. `STATUS:OK` → 输出 MESSAGE，结束
+4. `STATUS:NEED_QR` → `Read: <QR_PNG 路径>` 显示二维码图片
+5. 等待脚本完成（用户扫码后自动输出 STATUS:OK）
+
+脚本路径：通过 `find ~/.claude/plugins -name qr-login.mjs -path "*/deploy/*"` 定位。
+回退方案：脚本失败时用 `ldc login`，仍失败提示用户手动执行。
+
 ### 透传执行模式
 
-用于 login/review 等自带交互式 UI 的 ldc 命令：
+用于 review 等自带交互式 UI 的 ldc 命令：
 
 1. 直接 `Bash: ldc <command>`（设置合适的 timeout）
 2. 将 stdout 原样展示给用户
@@ -96,7 +109,7 @@ metadata:
 |------|---------|
 | `ldc ship` / `ldc build` | 600000 (10min) |
 | `ldc deploy list/publish/rollback` | 120000 (2min) |
-| `ldc login` | 120000 (2min，扫码需要时间) |
+| `ldc login`（qr-login.mjs） | 150000 (2.5min，含 PNG 生成+扫码) |
 | `ldc review` / `ldc whoami` | 60000 (1min) |
 
 ---

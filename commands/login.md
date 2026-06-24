@@ -16,19 +16,27 @@ tags: [deploy, login, ldc, auth]
      npm install -g ledu-cloud-cli --registry=https://registry.npmjs.org/
      ```
 
-2. **检查登录状态**
-   - `Bash: ldc whoami`
-   - 已登录 → 输出用户信息并结束
+2. **运行登录脚本**
+   - `Bash: node $(dirname "$(find ~/.claude/plugins -name qr-login.mjs -path "*/deploy/*" 2>/dev/null | head -1)")/qr-login.mjs`（timeout: 150000）
+   - 脚本会输出结构化状态信息
 
-3. **执行登录**
-   - `Bash: ldc login`（timeout: 120000）
-   - 终端会显示 ASCII 二维码，用户用手机扫码
-   - 等待登录完成，输出结果
+3. **处理输出**
+   - 解析 stdout 中的 `STATUS:` 和 `MESSAGE:` 行
+   - `STATUS:OK` → 输出 MESSAGE，结束
+   - `STATUS:NEED_QR` → 进入步骤 4
+   - `STATUS:ERROR` → 输出错误信息，结束
+
+4. **显示二维码**
+   - 从 stdout 解析 `QR_PNG:<path>` 获取 PNG 路径
+   - `Read: <QR_PNG 路径>` — 在对话中内联显示二维码图片
+   - 告诉用户："请使用知音楼好未来主体扫描二维码完成登录"
+   - 等待脚本完成（扫码后脚本会自动保存 token 并输出 STATUS:OK）
 
 ## 备选方案
 
-如果 `ldc login` 在 Bash 工具中无法正常工作（交互式提示卡住），提示用户：
-> 请在终端中手动执行 `ldc login` 完成扫码登录。
+如果辅助脚本运行失败（Node.js 环境问题、playwright 不可用等），回退到：
+- `Bash: ldc login`（timeout: 120000）
+- 如果终端二维码显示不完整，提示用户手动在终端执行 `ldc login`
 
 ## 安全约束
 
