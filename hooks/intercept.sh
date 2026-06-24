@@ -13,25 +13,31 @@ PROMPT=$(echo "$INPUT" | jq -r '.input.prompt // empty')
 CMD=""
 ARGS=""
 
-# 策略 1：直接匹配 /ldc: 前缀
-if [[ "$PROMPT" =~ ^/ldc:([a-z]+)(\ .*)? ]]; then
-  CMD="${BASH_REMATCH[1]}"
-  ARGS="${BASH_REMATCH[2]## }"
-# 策略 2：匹配展开后的标记
-elif [[ "$PROMPT" =~ LDC_CMD:([a-z]+) ]]; then
-  CMD="${BASH_REMATCH[1]}"
-  if [[ "$PROMPT" =~ LDC_ARGS:([^-]+)-- ]]; then
-    ARGS="${BASH_REMATCH[1]}"
-  fi
-  ARGS="${ARGS## }"
-  ARGS="${ARGS%% }"
+# 策略 1：直接匹配 /ldc: 前缀（用户输入未被展开）
+if echo "$PROMPT" | head -1 | grep -q '^/ldc:'; then
+  CMD=$(echo "$PROMPT" | head -1 | sed 's|^/ldc:\([a-z]*\).*|\1|')
+  ARGS=$(echo "$PROMPT" | head -1 | sed 's|^/ldc:[a-z]* *||')
+# 策略 2：匹配 <!-- LDC_CMD:xxx --> 标记
+elif echo "$PROMPT" | grep -q 'LDC_CMD:'; then
+  CMD=$(echo "$PROMPT" | sed -n 's/.*LDC_CMD:\([a-z]*\).*/\1/p' | head -1)
+# 策略 3：匹配 <command-name>/ldc:xxx</command-name> 标签
+elif echo "$PROMPT" | grep -q 'command-name>/ldc:'; then
+  CMD=$(echo "$PROMPT" | sed -n 's/.*command-name>\/ldc:\([a-z]*\)<.*/\1/p' | head -1)
+# 策略 4：匹配 <command-message>ldc:xxx</command-message> 标签
+elif echo "$PROMPT" | grep -q 'command-message>ldc:'; then
+  CMD=$(echo "$PROMPT" | sed -n 's/.*command-message>ldc:\([a-z]*\)<.*/\1/p' | head -1)
 fi
 
 if [[ -n "$CMD" ]]; then
   SCRIPT_DIR="$(cd "$(dirname "$0")/../scripts" && pwd)"
   if [[ -f "$SCRIPT_DIR/$CMD.sh" ]]; then
-    bash "$SCRIPT_DIR/$CMD.sh" "$ARGS" >&2
-    echo '{"decision": "block", "reason": "handled by ldc script"}'
+    # 捕获脚本输出，显示给用户
+    OUTPUT=$(bash "$SCRIPT_DIR/$CMD.sh" "$ARGS" 2>&1) || true
+    # 去除 ANSI 颜色码
+    CLEAN=$(echo "$OUTPUT" | sed $'s/\033\[[0-9;]*m//g')
+    # 用 jq 安全转义为 JSON 字符串
+    REASON=$(echo "$CLEAN" | jq -Rs '.')
+    echo "{\"decision\": \"block\", \"reason\": $REASON}"
     exit 0
   fi
 fi

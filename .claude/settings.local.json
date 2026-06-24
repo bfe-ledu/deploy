@@ -3,7 +3,12 @@
     "UserPromptSubmit": [
       {
         "matcher": "",
-        "hook": "/bin/bash hooks/intercept.sh"
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/bash hooks/intercept.sh"
+          }
+        ]
       }
     ]
   },
