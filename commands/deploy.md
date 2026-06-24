@@ -1,5 +1,5 @@
 ---
-name: "Deploy"
+name: "deploy"
 description: 发布管理 — 查看待发布列表或执行发布
 disable-model-invocation: true
 category: Deploy
@@ -13,11 +13,11 @@ tags: [deploy, publish, ldc]
 - `env`: `test` 或 `prod`，如果为空则交互式选择
 
 示例：
-- `/deploy list test` → 查看测试环境待发布列表
-- `/deploy publish prod` → 发布生产环境
-- `/deploy list` → 交互式选择环境，查看列表
-- `/deploy publish` → 交互式选择环境，执行发布
-- `/deploy` → 默认 list，交互式选择环境
+- `/ldc:deploy list test` → 查看测试环境待发布列表
+- `/ldc:deploy publish prod` → 发布生产环境
+- `/ldc:deploy list` → 交互式选择环境，查看列表
+- `/ldc:deploy publish` → 交互式选择环境，执行发布
+- `/ldc:deploy` → 默认 list，交互式选择环境
 
 **步骤**
 
@@ -32,7 +32,7 @@ tags: [deploy, publish, ldc]
 
    按照 `ldc-deploy` skill 中的配置读取流程：
    - 读取当前项目 `.claude/deploy.json`
-   - 不存在则提示 "运行 `/init` 初始化配置" 并中止
+   - 不存在则提示 "运行 `/ldc:init` 初始化配置" 并中止
 
 3. **解析参数**
 

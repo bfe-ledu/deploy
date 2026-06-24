@@ -1,5 +1,5 @@
 ---
-name: "Init"
+name: "init"
 description: 初始化项目的 .claude/deploy.json 部署配置
 disable-model-invocation: true
 category: Deploy
@@ -51,7 +51,7 @@ tags: [deploy, init, config, ldc]
 4. **展示结果**
 
    - 输出配置摘要（项目名、各环境 appId）
-   - 提示 "配置已生成，现在可以使用 `/ship test` 部署测试环境"
+   - 提示 "配置已生成，现在可以使用 `/ldc:ship test` 部署测试环境"
 
 **护栏**
 - 不自动覆盖已有配置

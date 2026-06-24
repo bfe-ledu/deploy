@@ -1,5 +1,5 @@
 ---
-name: "Login"
+name: "login"
 description: 扫码登录 ledu-cloud-cli
 disable-model-invocation: true
 category: Deploy

@@ -27,15 +27,15 @@
 |----------|------|
 | `.claude-plugin/plugin.json` | 插件元信息（已存在，需更新） |
 | `skills/ldc-deploy/SKILL.md` | 核心技能：前置检查、配置读取、环境选择、安全约束、结果展示 |
-| `commands/init.md` | /init — 初始化 .claude/deploy.json |
-| `commands/login.md` | /login — 扫码登录 |
-| `commands/whoami.md` | /whoami — 查看登录用户 |
-| `commands/ship.md` | /ship [test\|prod] — 一键构建+发布 |
-| `commands/build.md` | /build [test\|prod] — 仅构建 |
-| `commands/deploy.md` | /deploy [list\|publish] [test\|prod] — 发布管理 |
-| `commands/rollback.md` | /rollback [test\|prod] — 回滚 |
-| `commands/review.md` | /review — 批量审批 |
-| `commands/status.md` | /status [test\|prod] — 查看部署状态 |
+| `commands/init.md` | /ldc:init — 初始化 .claude/deploy.json |
+| `commands/login.md` | /ldc:login — 扫码登录 |
+| `commands/whoami.md` | /ldc:whoami — 查看登录用户 |
+| `commands/ship.md` | /ldc:ship [test\|prod] — 一键构建+发布 |
+| `commands/build.md` | /ldc:build [test\|prod] — 仅构建 |
+| `commands/deploy.md` | /ldc:deploy [list\|publish] [test\|prod] — 发布管理 |
+| `commands/rollback.md` | /ldc:rollback [test\|prod] — 回滚 |
+| `commands/review.md` | /ldc:review — 批量审批 |
+| `commands/status.md` | /ldc:status [test\|prod] — 查看部署状态 |
 | `README.md` | 使用说明（已存在，需重写） |
 
 ---
@@ -109,7 +109,7 @@ ldc whoami
 ```
 
 - 如果返回用户信息 → 已登录，继续
-- 如果报错或提示未登录 → 提示用户执行 `/login` 命令，中止执行
+- 如果报错或提示未登录 → 提示用户执行 `/ldc:login` 命令，中止执行
 
 ---
 
@@ -141,7 +141,7 @@ ldc whoami
 
 ### 配置不存在时
 
-如果 `.claude/deploy.json` 不存在，提示用户 "运行 `/init` 初始化项目配置" 并中止执行。
+如果 `.claude/deploy.json` 不存在，提示用户 "运行 `/ldc:init` 初始化项目配置" 并中止执行。
 
 ---
 
@@ -177,7 +177,7 @@ ldc whoami
 
 - **生产环境（prod）发布前必须使用 AskUserQuestion 进行二次确认**
 - **回滚操作（任何环境）必须使用 AskUserQuestion 进行二次确认**
-- 不自动执行 `ldc review` 审批操作（由 /review 命令专门处理）
+- 不自动执行 `ldc review` 审批操作（由 /ldc:review 命令专门处理）
 - 不修改登录凭证（不执行 `ldc logout`）
 
 ---
@@ -275,7 +275,7 @@ git commit -m "feat: 添加 plugin.json 和 ldc-deploy skill 核心文件"
 
 **Interfaces:**
 - Consumes: `ldc-deploy` skill 中的前置检查流程
-- Produces: `/init` 命令生成 `.claude/deploy.json`，供其他命令读取
+- Produces: `/ldc:init` 命令生成 `.claude/deploy.json`，供其他命令读取
 
 - [ ] **Step 1: 创建 commands/init.md**
 
@@ -332,7 +332,7 @@ tags: [deploy, init, config, ldc]
 4. **展示结果**
 
    - 输出配置摘要（项目名、各环境 appId）
-   - 提示 "配置已生成，现在可以使用 `/ship test` 部署测试环境"
+   - 提示 "配置已生成，现在可以使用 `/ldc:ship test` 部署测试环境"
 
 **护栏**
 - 不自动覆盖已有配置
@@ -417,7 +417,7 @@ tags: [deploy, whoami, ldc, auth]
 3. **展示结果**
 
    - 已登录 → 展示用户信息
-   - 未登录 → 提示"未登录，请执行 `/login` 登录"
+   - 未登录 → 提示"未登录，请执行 `/ldc:login` 登录"
 ```
 
 - [ ] **Step 4: Commit**
@@ -466,7 +466,7 @@ tags: [deploy, build, ship, ldc]
 
    按照 `ldc-deploy` skill 中的配置读取流程：
    - 读取当前项目 `.claude/deploy.json`
-   - 不存在则提示 "运行 `/init` 初始化配置" 并中止
+   - 不存在则提示 "运行 `/ldc:init` 初始化配置" 并中止
 
 3. **确定目标环境**
 
@@ -505,7 +505,7 @@ tags: [deploy, build, ship, ldc]
 
    - 成功：展示构建摘要（项目、环境、分支、commit），并输出未来云管理页链接（从配置中的 `cloudUrl` 读取）
    - 失败：提示构建失败，输出 cloudUrl 供用户前往未来云查看构建详情
-   - 如需审批（qa_audit=1）：提示等待审批，并告知后续执行 `/deploy publish`
+   - 如需审批（qa_audit=1）：提示等待审批，并告知后续执行 `/ldc:deploy publish`
 
 **护栏**
 - 生产环境发布前**必须**二次确认
@@ -540,7 +540,7 @@ tags: [deploy, build, ldc]
 
    按照 `ldc-deploy` skill 中的配置读取流程：
    - 读取当前项目 `.claude/deploy.json`
-   - 不存在则提示 "运行 `/init` 初始化配置" 并中止
+   - 不存在则提示 "运行 `/ldc:init` 初始化配置" 并中止
 
 3. **确定目标环境**
 
@@ -609,11 +609,11 @@ tags: [deploy, publish, ldc]
 - `env`: `test` 或 `prod`，如果为空则交互式选择
 
 示例：
-- `/deploy list test` → 查看测试环境待发布列表
-- `/deploy publish prod` → 发布生产环境
-- `/deploy list` → 交互式选择环境，查看列表
-- `/deploy publish` → 交互式选择环境，执行发布
-- `/deploy` → 默认 list，交互式选择环境
+- `/ldc:deploy list test` → 查看测试环境待发布列表
+- `/ldc:deploy publish prod` → 发布生产环境
+- `/ldc:deploy list` → 交互式选择环境，查看列表
+- `/ldc:deploy publish` → 交互式选择环境，执行发布
+- `/ldc:deploy` → 默认 list，交互式选择环境
 
 **步骤**
 
@@ -628,7 +628,7 @@ tags: [deploy, publish, ldc]
 
    按照 `ldc-deploy` skill 中的配置读取流程：
    - 读取当前项目 `.claude/deploy.json`
-   - 不存在则提示 "运行 `/init` 初始化配置" 并中止
+   - 不存在则提示 "运行 `/ldc:init` 初始化配置" 并中止
 
 3. **解析参数**
 
@@ -699,7 +699,7 @@ tags: [deploy, rollback, ldc]
 
    按照 `ldc-deploy` skill 中的配置读取流程：
    - 读取当前项目 `.claude/deploy.json`
-   - 不存在则提示 "运行 `/init` 初始化配置" 并中止
+   - 不存在则提示 "运行 `/ldc:init` 初始化配置" 并中止
 
 3. **确定目标环境**
 
@@ -763,7 +763,7 @@ tags: [deploy, status, ldc]
 
    按照 `ldc-deploy` skill 中的配置读取流程：
    - 读取当前项目 `.claude/deploy.json`
-   - 不存在则提示 "运行 `/init` 初始化配置" 并中止
+   - 不存在则提示 "运行 `/ldc:init` 初始化配置" 并中止
 
 3. **确定目标环境**
 
@@ -834,7 +834,7 @@ tags: [deploy, review, approve, ldc]
    - 检查登录状态（`ldc whoami`）
    - 未通过则按 skill 中的提示处理并中止
 
-   > 注意：`/review` 不需要项目配置（`.claude/deploy.json`），因为审批操作与具体项目无关。
+   > 注意：`/ldc:review` 不需要项目配置（`.claude/deploy.json`），因为审批操作与具体项目无关。
 
 2. **执行审批**
 
@@ -904,28 +904,28 @@ claude plugin add github:bfe-ledu/deploy
 
 ```bash
 # 1. 登录
-/login
+/ldc:login
 
 # 2. 初始化项目配置
-/init
+/ldc:init
 
 # 3. 一键部署测试环境
-/ship test
+/ldc:ship test
 ```
 
 ## 命令速览
 
 | 命令 | 说明 |
 |------|------|
-| `/ship [test\|prod]` | 一键构建+发布 |
-| `/build [test\|prod]` | 仅构建，不发布 |
-| `/deploy [list\|publish] [test\|prod]` | 发布管理 |
-| `/rollback [test\|prod]` | 回滚到上一版本 |
-| `/review` | 批量审批发布/团队申请 |
-| `/whoami` | 查看当前登录用户 |
-| `/status [test\|prod]` | 查看项目部署状态 |
-| `/login` | 扫码登录 |
-| `/init` | 初始化项目部署配置 |
+| `/ldc:ship [test\|prod]` | 一键构建+发布 |
+| `/ldc:build [test\|prod]` | 仅构建，不发布 |
+| `/ldc:deploy [list\|publish] [test\|prod]` | 发布管理 |
+| `/ldc:rollback [test\|prod]` | 回滚到上一版本 |
+| `/ldc:review` | 批量审批发布/团队申请 |
+| `/ldc:whoami` | 查看当前登录用户 |
+| `/ldc:status [test\|prod]` | 查看项目部署状态 |
+| `/ldc:login` | 扫码登录 |
+| `/ldc:init` | 初始化项目部署配置 |
 
 ## 项目配置
 
@@ -947,14 +947,14 @@ claude plugin add github:bfe-ledu/deploy
 }
 ```
 
-运行 `/init` 可以交互式生成此文件。
+运行 `/ldc:init` 可以交互式生成此文件。
 
 ## 推荐工作流
 
 ### 测试环境日常部署
 
 ```bash
-/ship test
+/ldc:ship test
 ```
 
 指定 test 分支，自动取最新 commit，一键完成构建+发布。
@@ -962,7 +962,7 @@ claude plugin add github:bfe-ledu/deploy
 ### 生产环境部署
 
 ```bash
-/ship prod
+/ldc:ship prod
 ```
 
 会进行二次确认，然后通过 ldc 交互式 UI 选择分支。
@@ -971,16 +971,16 @@ claude plugin add github:bfe-ledu/deploy
 
 ```bash
 # 1. 提交构建和申请
-/ship prod
+/ldc:ship prod
 
 # 2. 等待审批通过后，执行发布
-/deploy publish prod
+/ldc:deploy publish prod
 ```
 
 ### 回滚
 
 ```bash
-/rollback prod
+/ldc:rollback prod
 ```
 
 选择历史版本，回滚到指定版本（需二次确认）。
@@ -988,17 +988,17 @@ claude plugin add github:bfe-ledu/deploy
 ### 批量审批
 
 ```bash
-/review
+/ldc:review
 ```
 
 交互式审批项目发布和团队申请。
 
 ## 安全设计
 
-- **生产环境操作必须二次确认** — `/ship prod`、`/deploy publish prod`
+- **生产环境操作必须二次确认** — `/ldc:ship prod`、`/ldc:deploy publish prod`
 - **回滚操作必须二次确认** — 无论测试/生产环境
 - **不自动执行 `ldc logout`** — 避免意外清除凭证
-- **配置缺失时中止** — 不猜测 appId，引导用户 `/init`
+- **配置缺失时中止** — 不猜测 appId，引导用户 `/ldc:init`
 
 ## License
 

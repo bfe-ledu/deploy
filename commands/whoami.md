@@ -1,5 +1,5 @@
 ---
-name: "Whoami"
+name: "whoami"
 description: 查看当前 ldc 登录用户信息
 disable-model-invocation: true
 category: Deploy
@@ -30,4 +30,4 @@ tags: [deploy, whoami, ldc, auth]
 3. **展示结果**
 
    - 已登录 → 展示用户信息
-   - 未登录 → 提示"未登录，请执行 `/login` 登录"
+   - 未登录 → 提示"未登录，请执行 `/ldc:login` 登录"

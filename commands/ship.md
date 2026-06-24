@@ -1,5 +1,5 @@
 ---
-name: "Ship"
+name: "ship"
 description: 一键构建并发布项目到未来云（测试/生产环境）
 disable-model-invocation: true
 category: Deploy
@@ -23,7 +23,7 @@ tags: [deploy, build, ship, ldc]
 
    按照 `ldc-deploy` skill 中的配置读取流程：
    - 读取当前项目 `.claude/deploy.json`
-   - 不存在则提示 "运行 `/init` 初始化配置" 并中止
+   - 不存在则提示 "运行 `/ldc:init` 初始化配置" 并中止
 
 3. **确定目标环境**
 
@@ -62,7 +62,7 @@ tags: [deploy, build, ship, ldc]
 
    - 成功：展示构建摘要（项目、环境、分支、commit），并输出未来云管理页链接（从配置中的 `cloudUrl` 读取）
    - 失败：提示构建失败，输出 cloudUrl 供用户前往未来云查看构建详情
-   - 如需审批（qa_audit=1）：提示等待审批，并告知后续执行 `/deploy publish`
+   - 如需审批（qa_audit=1）：提示等待审批，并告知后续执行 `/ldc:deploy publish`
 
 **护栏**
 - 生产环境发布前**必须**二次确认

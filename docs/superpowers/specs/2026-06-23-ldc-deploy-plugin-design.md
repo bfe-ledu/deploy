@@ -10,7 +10,7 @@
 
 ### 目标
 
-从头设计一个 Claude Code Plugin，让团队前端开发人员通过 `/ship test` 等斜杠命令，一键完成项目在未来云平台的构建、发布、审批和回滚操作。
+从头设计一个 Claude Code Plugin，让团队前端开发人员通过 `/ldc:ship test` 等斜杠命令，一键完成项目在未来云平台的构建、发布、审批和回滚操作。
 
 ### 核心决策
 
@@ -18,7 +18,7 @@
 |------|------|------|
 | 架构 | 纯 Skill + Commands（方案 A） | 零代码、零依赖，纯 Markdown 维护成本最低 |
 | 目标用户 | 团队分发 | 通过 GitHub 仓库安装，开箱即用 |
-| 配置方式 | 兼容两种 | 优先读项目配置，无配置时引导 /init |
+| 配置方式 | 兼容两种 | 优先读项目配置，无配置时引导 /ldc:init |
 | CLI 依赖 | ledu-cloud-cli (ldc) | 复用已有 CLI 能力，Plugin 只做编排 |
 
 ---
@@ -33,15 +33,15 @@ bfe-tech/deploy/
 │   └── ldc-deploy/
 │       └── SKILL.md             # 核心技能：前置检查、配置读取、环境逻辑
 ├── commands/
-│   ├── ship.md                  # /ship [test|prod]
-│   ├── build.md                 # /build [test|prod]
-│   ├── deploy.md                # /deploy [list|publish] [test|prod]
-│   ├── rollback.md              # /rollback [test|prod]
-│   ├── review.md                # /review
-│   ├── whoami.md                # /whoami
-│   ├── status.md                # /status [test|prod]
-│   ├── login.md                 # /login
-│   └── init.md                  # /init
+│   ├── ship.md                  # /ldc:ship [test|prod]
+│   ├── build.md                 # /ldc:build [test|prod]
+│   ├── deploy.md                # /ldc:deploy [list|publish] [test|prod]
+│   ├── rollback.md              # /ldc:rollback [test|prod]
+│   ├── review.md                # /ldc:review
+│   ├── whoami.md                # /ldc:whoami
+│   ├── status.md                # /ldc:status [test|prod]
+│   ├── login.md                 # /ldc:login
+│   └── init.md                  # /ldc:init
 ├── README.md
 ├── LICENSE
 └── .gitignore
@@ -53,15 +53,15 @@ bfe-tech/deploy/
 
 | 命令 | 输入 | 说明 | 需要项目配置 |
 |------|------|------|:---:|
-| `/ship [test\|prod]` | 环境标识 | 一键构建+发布 | ✓ |
-| `/build [test\|prod]` | 环境标识 | 仅构建，不发布 | ✓ |
-| `/deploy [list\|publish] [test\|prod]` | action + 环境 | 发布管理 | ✓ |
-| `/rollback [test\|prod]` | 环境标识 | 回滚到上一版本 | ✓ |
-| `/review` | 无 | 批量审批发布/团队申请 | ✗ |
-| `/whoami` | 无 | 查看当前登录用户 | ✗ |
-| `/status [test\|prod]` | 环境标识 | 查看项目部署状态 | ✓ |
-| `/login` | 无 | 扫码登录 | ✗ |
-| `/init` | 无 | 初始化项目 deploy.json | ✗ |
+| `/ldc:ship [test\|prod]` | 环境标识 | 一键构建+发布 | ✓ |
+| `/ldc:build [test\|prod]` | 环境标识 | 仅构建，不发布 | ✓ |
+| `/ldc:deploy [list\|publish] [test\|prod]` | action + 环境 | 发布管理 | ✓ |
+| `/ldc:rollback [test\|prod]` | 环境标识 | 回滚到上一版本 | ✓ |
+| `/ldc:review` | 无 | 批量审批发布/团队申请 | ✗ |
+| `/ldc:whoami` | 无 | 查看当前登录用户 | ✗ |
+| `/ldc:status [test\|prod]` | 环境标识 | 查看项目部署状态 | ✓ |
+| `/ldc:login` | 无 | 扫码登录 | ✗ |
+| `/ldc:init` | 无 | 初始化项目 deploy.json | ✗ |
 
 ---
 
@@ -72,7 +72,7 @@ bfe-tech/deploy/
 | 模块 | 职责 |
 |------|------|
 | 前置检查 | 检查 ldc 安装 → 检查登录状态 |
-| 配置读取 | 读取 `.claude/deploy.json`，缺失时引导 /init |
+| 配置读取 | 读取 `.claude/deploy.json`，缺失时引导 /ldc:init |
 | 环境选择 | 参数指定 or AskUserQuestion 交互选择 |
 | 安全约束 | 生产环境二次确认、回滚必须确认、禁止 logout |
 | 结果展示 | 成功/失败/需审批 三种输出模板 |
@@ -89,7 +89,7 @@ Step 1: which ldc
 
 Step 2: ldc whoami
   ├── 返回用户信息 → 继续
-  └── 报错/未登录 → 提示: 执行 /login 或 ldc login
+  └── 报错/未登录 → 提示: 执行 /ldc:login 或 ldc login
                           中止执行
 ```
 
@@ -120,7 +120,7 @@ Step 2: ldc whoami
 1. 查找当前项目根目录的 `.claude/deploy.json`
 2. 解析 JSON 获取 `apps` 对象
 3. 根据目标环境（test/prod）获取对应的 `appId` 和 `cloudUrl`
-4. 不存在时提示 "运行 /init 初始化配置" 并中止
+4. 不存在时提示 "运行 /ldc:init 初始化配置" 并中止
 
 ### 4.4 环境选择逻辑
 
@@ -131,11 +131,11 @@ Step 2: ldc whoami
 
 | 场景 | 约束 |
 |------|------|
-| `/ship prod` | 必须 AskUserQuestion 二次确认 |
-| `/deploy publish prod` | 必须 AskUserQuestion 二次确认 |
-| `/rollback` (任何环境) | 必须 AskUserQuestion 二次确认（破坏性操作） |
+| `/ldc:ship prod` | 必须 AskUserQuestion 二次确认 |
+| `/ldc:deploy publish prod` | 必须 AskUserQuestion 二次确认 |
+| `/ldc:rollback` (任何环境) | 必须 AskUserQuestion 二次确认（破坏性操作） |
 | `ldc logout` | 不自动执行 |
-| `/review` | 展示详细列表，由用户确认 |
+| `/ldc:review` | 展示详细列表，由用户确认 |
 
 ### 4.6 超时策略
 
@@ -149,7 +149,7 @@ Step 2: ldc whoami
 
 ## 5. 各命令详细设计
 
-### 5.1 `/init` — 初始化项目配置
+### 5.1 `/ldc:init` — 初始化项目配置
 
 **输入：** 无参数
 
@@ -163,11 +163,11 @@ Step 2: ldc whoami
    - 测试环境 App ID
    - 生产环境 App ID（可选）
 3. 生成 `.claude/deploy.json` 并写入
-4. 展示配置摘要，提示 "配置已生成，现在可以使用 /ship test 部署"
+4. 展示配置摘要，提示 "配置已生成，现在可以使用 /ldc:ship test 部署"
 
 ---
 
-### 5.2 `/login` — 登录
+### 5.2 `/ldc:login` — 登录
 
 **输入：** 无参数
 
@@ -181,7 +181,7 @@ Step 2: ldc whoami
 
 ---
 
-### 5.3 `/whoami` — 查看用户信息
+### 5.3 `/ldc:whoami` — 查看用户信息
 
 **输入：** 无参数
 
@@ -192,7 +192,7 @@ Step 2: ldc whoami
 
 ---
 
-### 5.4 `/ship [test|prod]` — 一键构建+发布
+### 5.4 `/ldc:ship [test|prod]` — 一键构建+发布
 
 **输入：** `$ARGUMENTS` = `test` 或 `prod` 或空
 
@@ -211,11 +211,11 @@ Step 2: ldc whoami
 6. 展示结果：
    - 成功 → 构建摘要 + cloudUrl 链接
    - 失败 → 错误信息 + cloudUrl 链接（查看详情）
-   - 需审批 → 提示等待审批，后续执行 `/deploy publish`
+   - 需审批 → 提示等待审批，后续执行 `/ldc:deploy publish`
 
 ---
 
-### 5.5 `/build [test|prod]` — 仅构建
+### 5.5 `/ldc:build [test|prod]` — 仅构建
 
 **输入：** `$ARGUMENTS` = `test` 或 `prod` 或空
 
@@ -231,7 +231,7 @@ Step 2: ldc whoami
 
 ---
 
-### 5.6 `/deploy [action] [env]` — 发布管理
+### 5.6 `/ldc:deploy [action] [env]` — 发布管理
 
 **输入：** `$ARGUMENTS` = `[list|publish] [test|prod]`
 
@@ -252,7 +252,7 @@ Step 2: ldc whoami
 
 ---
 
-### 5.7 `/rollback [test|prod]` — 回滚
+### 5.7 `/ldc:rollback [test|prod]` — 回滚
 
 **输入：** `$ARGUMENTS` = `test` 或 `prod` 或空
 
@@ -267,7 +267,7 @@ Step 2: ldc whoami
 
 ---
 
-### 5.8 `/review` — 批量审批
+### 5.8 `/ldc:review` — 批量审批
 
 **输入：** 无参数
 
@@ -281,7 +281,7 @@ Step 2: ldc whoami
 
 ---
 
-### 5.9 `/status [test|prod]` — 查看部署状态
+### 5.9 `/ldc:status [test|prod]` — 查看部署状态
 
 **输入：** `$ARGUMENTS` = `test` 或 `prod` 或空
 
@@ -314,13 +314,13 @@ claude plugin add /path/to/bfe-tech/deploy
 claude plugin add github:bfe-ledu/deploy
 
 # 2. 登录
-/login
+/ldc:login
 
 # 3. 在项目中初始化配置
-/init
+/ldc:init
 
 # 4. 一键部署测试环境
-/ship test
+/ldc:ship test
 ```
 
 ### 前置要求
@@ -353,5 +353,5 @@ claude plugin add github:bfe-ledu/deploy
 1. **生产环境操作必须二次确认** — ship prod / deploy publish prod / rollback（任何环境）
 2. **不自动执行 ldc logout** — 避免意外清除凭证
 3. **不修改项目代码** — Plugin 只执行部署操作，不改动源码
-4. **配置缺失时中止** — 不猜测 appId，引导用户 /init
+4. **配置缺失时中止** — 不猜测 appId，引导用户 /ldc:init
 5. **命令独立** — 每个命令可以单独使用，不强制执行顺序

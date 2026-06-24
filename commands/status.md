@@ -1,5 +1,5 @@
 ---
-name: "Status"
+name: "status"
 description: 查看项目部署状态和最近发布记录
 disable-model-invocation: true
 category: Deploy
@@ -23,7 +23,7 @@ tags: [deploy, status, ldc]
 
    按照 `ldc-deploy` skill 中的配置读取流程：
    - 读取当前项目 `.claude/deploy.json`
-   - 不存在则提示 "运行 `/init` 初始化配置" 并中止
+   - 不存在则提示 "运行 `/ldc:init` 初始化配置" 并中止
 
 3. **确定目标环境**
 

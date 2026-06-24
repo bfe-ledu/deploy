@@ -1,5 +1,5 @@
 ---
-name: "Review"
+name: "review"
 description: 批量审批项目发布和团队申请
 disable-model-invocation: true
 category: Deploy
@@ -19,7 +19,7 @@ tags: [deploy, review, approve, ldc]
    - 检查登录状态（`ldc whoami`）
    - 未通过则按 skill 中的提示处理并中止
 
-   > 注意：`/review` 不需要项目配置（`.claude/deploy.json`），因为审批操作与具体项目无关。
+   > 注意：`/ldc:review` 不需要项目配置（`.claude/deploy.json`），因为审批操作与具体项目无关。
 
 2. **执行审批**
 

@@ -39,7 +39,7 @@ ldc whoami
 ```
 
 - 如果返回用户信息 → 已登录，继续
-- 如果报错或提示未登录 → 提示用户执行 `/login` 命令，中止执行
+- 如果报错或提示未登录 → 提示用户执行 `/ldc:login` 命令，中止执行
 
 ---
 
@@ -71,7 +71,7 @@ ldc whoami
 
 ### 配置不存在时
 
-如果 `.claude/deploy.json` 不存在，提示用户 "运行 `/init` 初始化项目配置" 并中止执行。
+如果 `.claude/deploy.json` 不存在，提示用户 "运行 `/ldc:init` 初始化项目配置" 并中止执行。
 
 ---
 
@@ -107,7 +107,7 @@ ldc whoami
 
 - **生产环境（prod）发布前必须使用 AskUserQuestion 进行二次确认**
 - **回滚操作（任何环境）必须使用 AskUserQuestion 进行二次确认**
-- 不自动执行 `ldc review` 审批操作（由 /review 命令专门处理）
+- 不自动执行 `ldc review` 审批操作（由 /ldc:review 命令专门处理）
 - 不修改登录凭证（不执行 `ldc logout`）
 
 ---
