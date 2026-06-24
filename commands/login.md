@@ -1,40 +1,35 @@
 ---
 name: "Login"
 description: 扫码登录 ledu-cloud-cli
-disable-model-invocation: true
 category: Deploy
 tags: [deploy, login, ldc, auth]
 ---
 
-登录 ledu-cloud-cli，获取部署操作所需的凭证。
+扫码登录未来云。
 
-**输入**: 无参数
+## 编排流程
 
-**步骤**
-
-1. **检查 ldc 是否安装**
-
-   按照 `ldc-deploy` skill 中的前置检查步骤 1：
-   - 执行 `which ldc`
-   - 未安装 → AskUserQuestion 询问是否自动安装
-     - 同意 → 执行 `npm install -g ledu-cloud-cli --registry=https://registry.npmjs.org/`
-     - 拒绝 → 中止
+1. **检查 ldc 安装**
+   - `Bash: which ldc`
+   - 未安装 → 输出安装命令并结束：
+     ```
+     npm install -g ledu-cloud-cli --registry=https://registry.npmjs.org/
+     ```
 
 2. **检查登录状态**
-
-   执行 `ldc whoami`：
-   - 已登录 → 展示用户信息，提示"已登录，无需重复操作"，结束
+   - `Bash: ldc whoami`
+   - 已登录 → 输出用户信息并结束
 
 3. **执行登录**
+   - `Bash: ldc login`（timeout: 120000）
+   - 终端会显示 ASCII 二维码，用户用手机扫码
+   - 等待登录完成，输出结果
 
-   ```bash
-   ldc login
-   ```
-   设置 `timeout: 60000`（1 分钟）
+## 备选方案
 
-4. **验证登录**
+如果 `ldc login` 在 Bash 工具中无法正常工作（交互式提示卡住），提示用户：
+> 请在终端中手动执行 `ldc login` 完成扫码登录。
 
-   执行 `ldc whoami` 验证登录成功，展示用户信息。
+## 安全约束
 
-**护栏**
 - 不执行 `ldc logout`
