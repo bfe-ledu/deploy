@@ -30,7 +30,7 @@ fi
 if [[ -n "$CMD" ]]; then
   SCRIPT_DIR="$(cd "$(dirname "$0")/../scripts" && pwd)"
   if [[ -f "$SCRIPT_DIR/$CMD.sh" ]]; then
-    bash "$SCRIPT_DIR/$CMD.sh" "$ARGS"
+    bash "$SCRIPT_DIR/$CMD.sh" "$ARGS" >&2
     echo '{"decision": "block", "reason": "handled by ldc script"}'
     exit 0
   fi
