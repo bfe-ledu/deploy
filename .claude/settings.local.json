@@ -6,5 +6,10 @@
         "hook": "/bin/bash hooks/intercept.sh"
       }
     ]
+  },
+  "permissions": {
+    "allow": [
+      "WebSearch"
+    ]
   }
 }
