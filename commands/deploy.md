@@ -1,76 +1,45 @@
 ---
 name: "Deploy"
 description: 发布管理 — 查看待发布列表或执行发布
-disable-model-invocation: true
 category: Deploy
 tags: [deploy, publish, ldc]
 ---
 
-发布管理：查看待发布列表或执行已审批的发布。
+发布管理。`$ARGUMENTS` 格式 `[action] [env]`，action 为 `list`（默认）或 `publish`，env 为 `test` 或 `prod`。
 
-**输入**: `$ARGUMENTS` 格式为 `[action] [env]`
-- `action`: `list`（查看列表）或 `publish`（执行发布），默认 `list`
-- `env`: `test` 或 `prod`，如果为空则交互式选择
-
-示例：
-- `/deploy list test` → 查看测试环境待发布列表
-- `/deploy publish prod` → 发布生产环境
-- `/deploy list` → 交互式选择环境，查看列表
-- `/deploy publish` → 交互式选择环境，执行发布
-- `/deploy` → 默认 list，交互式选择环境
-
-**步骤**
+## 编排流程
 
 1. **前置检查**
-
-   按照 `ldc-deploy` skill 中的前置检查流程：
-   - 检查 `ldc` 是否安装（`which ldc`），未安装则询问是否自动安装
-   - 检查登录状态（`ldc whoami`）
-   - 未通过则按 skill 中的提示处理并中止
+   - `Bash: which ldc` — 未安装提示安装命令
+   - `Bash: ldc whoami` — 未登录提示 `/login`
 
 2. **读取项目配置**
+   - `Read: .claude/deploy.json`
+   - 不存在 → 提示执行 `/init` 并结束
 
-   按照 `ldc-deploy` skill 中的配置读取流程：
-   - 读取当前项目 `.claude/deploy.json`
-   - 不存在则提示 "运行 `/init` 初始化配置" 并中止
+3. **确定操作类型**
+   - `$ARGUMENTS` 包含 `list` → 操作为 list
+   - `$ARGUMENTS` 包含 `publish` → 操作为 publish
+   - 未指定 → `AskUserQuestion` 选择：
+     - 选项："list"（查看待发布列表）、"publish"（执行发布）
 
-3. **解析参数**
+4. **确定环境**
+   - `$ARGUMENTS` 包含 `test` → 环境为 test，使用 `apps.test.appId`
+   - `$ARGUMENTS` 包含 `prod` → 环境为 prod，使用 `apps.prod.appId`
+   - 未指定 → `AskUserQuestion` 选择：
+     - 选项："test"（测试环境）、"prod"（生产环境）
 
-   从 `$ARGUMENTS` 中解析 action 和 env：
-   - 第一个词是 action（`list` 或 `publish`）
-   - 第二个词是 env（`test` 或 `prod`）
-   - 如果只有 action 没有 env → 使用 AskUserQuestion 选择环境
-   - 如果都为空 → action 默认 `list`，env 交互式选择
+5. **生产环境发布二次确认**
+   - 操作为 `publish` 且环境为 `prod` → `AskUserQuestion`：
+     - 问题："确认要在生产环境执行发布吗？"
+     - 选项："确认发布"、"取消"
 
-4. **生产环境发布确认**
+6. **执行命令**
+   - list: `Bash: ldc deploy list <appId>`（timeout: 120000）
+   - publish: `Bash: ldc deploy publish <appId>`（timeout: 120000）
+   - 输出结果
 
-   如果 action 为 `publish` 且环境为 `prod`，**必须**使用 AskUserQuestion 进行二次确认。
+## 安全约束
 
-5. **执行命令**
-
-   根据 action 执行对应命令：
-
-   **list（查看待发布列表）：**
-   ```bash
-   ldc deploy list <appId>
-   ```
-
-   **publish（执行发布）：**
-   ```bash
-   ldc deploy publish <appId>
-   ```
-
-   其中 `<appId>` 根据目标环境从 `.claude/deploy.json` 中读取。
-
-   设置 `timeout: 120000`（2 分钟）
-
-6. **展示结果**
-
-   - list 成功：展示待发布记录列表
-   - publish 成功：展示发布结果，输出 cloudUrl
-   - 失败：展示错误信息和排查建议
-
-**护栏**
-- 生产环境发布前**必须**二次确认
-- 不执行 `ldc review` 审批操作
-- 不执行 `ldc logout`
+- publish + prod 必须二次确认
+- 不执行 `ldc review` / `ldc logout`
