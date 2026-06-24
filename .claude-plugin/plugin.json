@@ -1,5 +1,5 @@
 {
-  "name": "ldc-deploy",
+  "name": "ldc",
   "description": "未来云一键部署 — 通过 ldc CLI 完成构建、发布、审批、回滚",
   "version": "1.0.0",
   "author": { "name": "bfe-ledu", "email": "p_zhaoxin10@ledupeiyou.com" },

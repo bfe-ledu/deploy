@@ -12,7 +12,7 @@
 
 - 纯 Markdown 文件，不使用任何编程语言或第三方依赖
 - 命令文件使用 YAML frontmatter: `name`, `description`, `category`, `tags`
-- 所有命令引用 `ldc-deploy` skill 的共享流程，不重复定义逻辑
+- 所有命令引用 `ldc` skill 的共享流程，不重复定义逻辑
 - 生产环境操作必须 AskUserQuestion 二次确认
 - 回滚操作无论环境必须二次确认
 - 不自动执行 `ldc logout`
@@ -26,7 +26,7 @@
 | 文件路径 | 职责 |
 |----------|------|
 | `.claude-plugin/plugin.json` | 插件元信息（已存在，需更新） |
-| `skills/ldc-deploy/SKILL.md` | 核心技能：前置检查、配置读取、环境选择、安全约束、结果展示 |
+| `skills/ldc/SKILL.md` | 核心技能：前置检查、配置读取、环境选择、安全约束、结果展示 |
 | `commands/init.md` | /init — 初始化 .claude/deploy.json |
 | `commands/login.md` | /login — 扫码登录 |
 | `commands/whoami.md` | /whoami — 查看登录用户 |
@@ -44,10 +44,10 @@
 
 **Files:**
 - Modify: `.claude-plugin/plugin.json`
-- Create: `skills/ldc-deploy/SKILL.md`
+- Create: `skills/ldc/SKILL.md`
 
 **Interfaces:**
-- Produces: Skill 文件中定义的共享流程（前置检查、配置读取、环境选择、安全约束），所有后续 command 文件通过 "按照 `ldc-deploy` skill 中的 XXX 流程" 引用
+- Produces: Skill 文件中定义的共享流程（前置检查、配置读取、环境选择、安全约束），所有后续 command 文件通过 "按照 `ldc` skill 中的 XXX 流程" 引用
 
 - [ ] **Step 1: 更新 plugin.json**
 
@@ -55,7 +55,7 @@
 
 ```json
 {
-  "name": "ldc-deploy",
+  "name": "ldc",
   "description": "未来云一键部署 — 通过 ldc CLI 完成构建、发布、审批、回滚",
   "version": "1.0.0",
   "author": { "name": "bfe-ledu", "email": "p_zhaoxin10@ledupeiyou.com" },
@@ -66,11 +66,11 @@
 }
 ```
 
-- [ ] **Step 2: 创建 skills/ldc-deploy/SKILL.md**
+- [ ] **Step 2: 创建 skills/ldc/SKILL.md**
 
 ```markdown
 ---
-name: ldc-deploy
+name: ldc
 description: 通过 ledu-cloud-cli (ldc) 进行项目构建和部署。支持测试环境和生产环境的一键 ship、build、deploy、rollback、review 操作。
 metadata:
   author: bfe-ledu
@@ -261,7 +261,7 @@ ldc deploy publish <appId>
 
 ```bash
 git add .claude-plugin/plugin.json skills/
-git commit -m "feat: 添加 plugin.json 和 ldc-deploy skill 核心文件"
+git commit -m "feat: 添加 plugin.json 和 ldc skill 核心文件"
 ```
 
 ---
@@ -274,7 +274,7 @@ git commit -m "feat: 添加 plugin.json 和 ldc-deploy skill 核心文件"
 - Create: `commands/whoami.md`
 
 **Interfaces:**
-- Consumes: `ldc-deploy` skill 中的前置检查流程
+- Consumes: `ldc` skill 中的前置检查流程
 - Produces: `/init` 命令生成 `.claude/deploy.json`，供其他命令读取
 
 - [ ] **Step 1: 创建 commands/init.md**
@@ -357,7 +357,7 @@ tags: [deploy, login, ldc, auth]
 
 1. **检查 ldc 是否安装**
 
-   按照 `ldc-deploy` skill 中的前置检查步骤 1：
+   按照 `ldc` skill 中的前置检查步骤 1：
    - 执行 `which ldc`
    - 未安装 → AskUserQuestion 询问是否自动安装
      - 同意 → 执行 `npm install -g ledu-cloud-cli --registry=https://registry.npmjs.org/`
@@ -401,7 +401,7 @@ tags: [deploy, whoami, ldc, auth]
 
 1. **检查 ldc 是否安装**
 
-   按照 `ldc-deploy` skill 中的前置检查步骤 1：
+   按照 `ldc` skill 中的前置检查步骤 1：
    - 执行 `which ldc`
    - 未安装 → AskUserQuestion 询问是否自动安装
      - 同意 → 执行 `npm install -g ledu-cloud-cli --registry=https://registry.npmjs.org/`
@@ -436,7 +436,7 @@ git commit -m "feat: 添加 init、login、whoami 命令"
 - Create: `commands/build.md`
 
 **Interfaces:**
-- Consumes: `ldc-deploy` skill 中的前置检查、配置读取、环境选择、安全约束流程
+- Consumes: `ldc` skill 中的前置检查、配置读取、环境选择、安全约束流程
 - Produces: 执行 ldc ship/build 命令完成构建和发布
 
 - [ ] **Step 1: 创建 commands/ship.md**
@@ -457,20 +457,20 @@ tags: [deploy, build, ship, ldc]
 
 1. **前置检查**
 
-   按照 `ldc-deploy` skill 中的前置检查流程：
+   按照 `ldc` skill 中的前置检查流程：
    - 检查 `ldc` 是否安装（`which ldc`），未安装则询问是否自动安装
    - 检查登录状态（`ldc whoami`）
    - 未通过则按 skill 中的提示处理并中止
 
 2. **读取项目配置**
 
-   按照 `ldc-deploy` skill 中的配置读取流程：
+   按照 `ldc` skill 中的配置读取流程：
    - 读取当前项目 `.claude/deploy.json`
    - 不存在则提示 "运行 `/init` 初始化配置" 并中止
 
 3. **确定目标环境**
 
-   按照 `ldc-deploy` skill 中的环境处理逻辑：
+   按照 `ldc` skill 中的环境处理逻辑：
    - `$ARGUMENTS` 为 `test` → 测试环境
    - `$ARGUMENTS` 为 `prod` → 生产环境
    - `$ARGUMENTS` 为空 → 使用 AskUserQuestion 让用户选择
@@ -531,20 +531,20 @@ tags: [deploy, build, ldc]
 
 1. **前置检查**
 
-   按照 `ldc-deploy` skill 中的前置检查流程：
+   按照 `ldc` skill 中的前置检查流程：
    - 检查 `ldc` 是否安装（`which ldc`），未安装则询问是否自动安装
    - 检查登录状态（`ldc whoami`）
    - 未通过则按 skill 中的提示处理并中止
 
 2. **读取项目配置**
 
-   按照 `ldc-deploy` skill 中的配置读取流程：
+   按照 `ldc` skill 中的配置读取流程：
    - 读取当前项目 `.claude/deploy.json`
    - 不存在则提示 "运行 `/init` 初始化配置" 并中止
 
 3. **确定目标环境**
 
-   按照 `ldc-deploy` skill 中的环境处理逻辑：
+   按照 `ldc` skill 中的环境处理逻辑：
    - `$ARGUMENTS` 为 `test` → 测试环境
    - `$ARGUMENTS` 为 `prod` → 生产环境
    - `$ARGUMENTS` 为空 → 使用 AskUserQuestion 让用户选择
@@ -589,7 +589,7 @@ git commit -m "feat: 添加 ship 和 build 命令"
 - Create: `commands/status.md`
 
 **Interfaces:**
-- Consumes: `ldc-deploy` skill 中的前置检查、配置读取、环境选择、安全约束流程
+- Consumes: `ldc` skill 中的前置检查、配置读取、环境选择、安全约束流程
 - Produces: 执行 ldc deploy 系列命令完成发布管理
 
 - [ ] **Step 1: 创建 commands/deploy.md**
@@ -619,14 +619,14 @@ tags: [deploy, publish, ldc]
 
 1. **前置检查**
 
-   按照 `ldc-deploy` skill 中的前置检查流程：
+   按照 `ldc` skill 中的前置检查流程：
    - 检查 `ldc` 是否安装（`which ldc`），未安装则询问是否自动安装
    - 检查登录状态（`ldc whoami`）
    - 未通过则按 skill 中的提示处理并中止
 
 2. **读取项目配置**
 
-   按照 `ldc-deploy` skill 中的配置读取流程：
+   按照 `ldc` skill 中的配置读取流程：
    - 读取当前项目 `.claude/deploy.json`
    - 不存在则提示 "运行 `/init` 初始化配置" 并中止
 
@@ -690,20 +690,20 @@ tags: [deploy, rollback, ldc]
 
 1. **前置检查**
 
-   按照 `ldc-deploy` skill 中的前置检查流程：
+   按照 `ldc` skill 中的前置检查流程：
    - 检查 `ldc` 是否安装（`which ldc`），未安装则询问是否自动安装
    - 检查登录状态（`ldc whoami`）
    - 未通过则按 skill 中的提示处理并中止
 
 2. **读取项目配置**
 
-   按照 `ldc-deploy` skill 中的配置读取流程：
+   按照 `ldc` skill 中的配置读取流程：
    - 读取当前项目 `.claude/deploy.json`
    - 不存在则提示 "运行 `/init` 初始化配置" 并中止
 
 3. **确定目标环境**
 
-   按照 `ldc-deploy` skill 中的环境处理逻辑：
+   按照 `ldc` skill 中的环境处理逻辑：
    - `$ARGUMENTS` 为 `test` → 测试环境
    - `$ARGUMENTS` 为 `prod` → 生产环境
    - `$ARGUMENTS` 为空 → 使用 AskUserQuestion 让用户选择
@@ -754,20 +754,20 @@ tags: [deploy, status, ldc]
 
 1. **前置检查**
 
-   按照 `ldc-deploy` skill 中的前置检查流程：
+   按照 `ldc` skill 中的前置检查流程：
    - 检查 `ldc` 是否安装（`which ldc`），未安装则询问是否自动安装
    - 检查登录状态（`ldc whoami`）
    - 未通过则按 skill 中的提示处理并中止
 
 2. **读取项目配置**
 
-   按照 `ldc-deploy` skill 中的配置读取流程：
+   按照 `ldc` skill 中的配置读取流程：
    - 读取当前项目 `.claude/deploy.json`
    - 不存在则提示 "运行 `/init` 初始化配置" 并中止
 
 3. **确定目标环境**
 
-   按照 `ldc-deploy` skill 中的环境处理逻辑：
+   按照 `ldc` skill 中的环境处理逻辑：
    - `$ARGUMENTS` 为 `test` → 测试环境
    - `$ARGUMENTS` 为 `prod` → 生产环境
    - `$ARGUMENTS` 为空 → 使用 AskUserQuestion 让用户选择
@@ -808,7 +808,7 @@ git commit -m "feat: 添加 deploy、rollback、status 命令"
 - Create: `commands/review.md`
 
 **Interfaces:**
-- Consumes: `ldc-deploy` skill 中的前置检查流程（仅安装+登录检查，不需要项目配置）
+- Consumes: `ldc` skill 中的前置检查流程（仅安装+登录检查，不需要项目配置）
 - Produces: 执行 ldc review 完成审批
 
 - [ ] **Step 1: 创建 commands/review.md**
@@ -829,7 +829,7 @@ tags: [deploy, review, approve, ldc]
 
 1. **前置检查**
 
-   按照 `ldc-deploy` skill 中的前置检查流程：
+   按照 `ldc` skill 中的前置检查流程：
    - 检查 `ldc` 是否安装（`which ldc`），未安装则询问是否自动安装
    - 检查登录状态（`ldc whoami`）
    - 未通过则按 skill 中的提示处理并中止
@@ -1054,9 +1054,9 @@ find . -not -path './.git/*' -type f | sort
 ./commands/ship.md
 ./commands/status.md
 ./commands/whoami.md
-./docs/superpowers/plans/2026-06-23-ldc-deploy-plugin.md
-./docs/superpowers/specs/2026-06-23-ldc-deploy-plugin-design.md
-./skills/ldc-deploy/SKILL.md
+./docs/superpowers/plans/2026-06-23-ldc-plugin.md
+./docs/superpowers/specs/2026-06-23-ldc-plugin-design.md
+./skills/ldc/SKILL.md
 ```
 
 - [ ] **Step 2: 验证 plugin.json 格式**

@@ -22,7 +22,7 @@
 
 | File | Responsibility | Change |
 |------|---------------|--------|
-| `skills/ldc-deploy/SKILL.md` | 核心参考手册：编排模式、错误处理、命令分类 | 增强 |
+| `skills/ldc/SKILL.md` | 核心参考手册：编排模式、错误处理、命令分类 | 增强 |
 | `commands/login.md` | 扫码登录编排 | 改写 |
 | `commands/ship.md` | 构建+发布编排（含分支选择） | 改写 |
 | `commands/review.md` | 审批管理编排 | 改写 |
@@ -35,7 +35,7 @@
 ### Task 1: 增强 SKILL.md 核心参考手册
 
 **Files:**
-- Modify: `skills/ldc-deploy/SKILL.md`
+- Modify: `skills/ldc/SKILL.md`
 
 **Interfaces:**
 - Consumes: 无（基础任务）
@@ -43,11 +43,11 @@
 
 - [ ] **Step 1: 改写 SKILL.md**
 
-将 `skills/ldc-deploy/SKILL.md` 替换为以下内容：
+将 `skills/ldc/SKILL.md` 替换为以下内容：
 
 ```markdown
 ---
-name: ldc-deploy
+name: ldc
 description: 通过 ledu-cloud-cli (ldc) 进行项目构建和部署。支持测试环境和生产环境的一键 ship、build、deploy、rollback、review 操作。
 metadata:
   author: bfe-ledu
@@ -188,7 +188,7 @@ metadata:
 - [ ] **Step 2: 提交**
 
 ```bash
-git add skills/ldc-deploy/SKILL.md
+git add skills/ldc/SKILL.md
 git commit -m "feat: 增强 SKILL.md，添加编排模式和错误处理"
 ```
 
@@ -588,7 +588,7 @@ git commit -m "feat: 改写 init.md，移除 disable-model-invocation"
 **Files:** 无文件变更，仅验证
 
 **Interfaces:**
-- Consumes: 所有改写后的 commands/*.md 和 skills/ldc-deploy/SKILL.md
+- Consumes: 所有改写后的 commands/*.md 和 skills/ldc/SKILL.md
 - Produces: 验证报告
 
 - [ ] **Step 1: 验证 whoami（直接执行命令未变）**

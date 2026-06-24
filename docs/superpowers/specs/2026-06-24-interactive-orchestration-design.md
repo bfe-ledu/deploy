@@ -41,7 +41,7 @@
 | `commands/review.md` | 改写 | 同上，加入审批列表展示 + 选择流程 |
 | `commands/rollback.md` | 改写 | 同上，加入版本选择流程 |
 | `commands/deploy.md` | 改写 | 同上 |
-| `skills/ldc-deploy/SKILL.md` | 增强 | 加入详细的编排模式、API 参考、错误处理 |
+| `skills/ldc/SKILL.md` | 增强 | 加入详细的编排模式、API 参考、错误处理 |
 | `commands/whoami.md` | 不变 | 保持直接执行 |
 | `commands/status.md` | 不变 | 保持直接执行 |
 | `commands/build.md` | 不变 | 保持直接执行 |

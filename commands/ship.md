@@ -14,14 +14,15 @@ tags: [deploy, build, ship, ldc]
    - `Bash: ldc whoami` — 未登录提示 `/login`
 
 2. **读取项目配置**
-   - `Read: .claude/deploy.json`
+   - `Read: .ldc.json`
    - 不存在 → 提示执行 `/init` 并结束
 
 3. **确定部署环境**
-   - `$ARGUMENTS` 包含 `test` → 环境为 test，使用 `apps.test.appId`
-   - `$ARGUMENTS` 包含 `prod` → 环境为 prod，使用 `apps.prod.appId`
+   - `$ARGUMENTS` 包含 `test` → 环境为 test
+   - `$ARGUMENTS` 包含 `prod` → 环境为 prod
+   - `$ARGUMENTS` 包含 `pre` → 环境为 pre
    - `$ARGUMENTS` 为空 → `AskUserQuestion` 选择环境：
-     - 选项：`test`（测试环境）、`prod`（生产环境）
+     - 选项：`test`（测试环境）、`prod`（生产环境）、`pre`（预发环境，如已配置）
 
 4. **生产环境二次确认**
    - 环境为 `prod` → `AskUserQuestion`：
@@ -38,8 +39,8 @@ tags: [deploy, build, ship, ldc]
    - 如果 `git branch -r` 无输出 → 让用户手动输入分支名
 
 6. **执行构建发布**
-   - test: `Bash: ldc ship <apps.test.appId> -b <branch>`（timeout: 600000）
-   - prod: `Bash: ldc ship <apps.prod.appId> -b <branch>`（timeout: 600000）
+   - `Bash: ldc ship <env> -b <branch>`（timeout: 600000）
+   - 其中 `<env>` 为环境标识（test/prod/pre），ldc 会自动从 `.ldc.json` 读取对应 App ID
    - 输出构建进度和结果
 
 ## 安全约束

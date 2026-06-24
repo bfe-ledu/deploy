@@ -30,7 +30,7 @@ bfe-tech/deploy/
 ├── .claude-plugin/
 │   └── plugin.json              # 插件元信息
 ├── skills/
-│   └── ldc-deploy/
+│   └── ldc/
 │       └── SKILL.md             # 核心技能：前置检查、配置读取、环境逻辑
 ├── commands/
 │   ├── ship.md                  # /ship [test|prod]
@@ -65,7 +65,7 @@ bfe-tech/deploy/
 
 ---
 
-## 4. Skill 核心逻辑 (`ldc-deploy`)
+## 4. Skill 核心逻辑 (`ldc`)
 
 ### 4.1 共享模块
 
@@ -335,7 +335,7 @@ claude plugin add github:bfe-ledu/deploy
 
 ```json
 {
-  "name": "ldc-deploy",
+  "name": "ldc",
   "description": "未来云一键部署 — 通过 ldc CLI 完成构建、发布、审批、回滚",
   "version": "1.0.0",
   "author": { "name": "bfe-ledu", "email": "p_zhaoxin10@ledupeiyou.com" },
