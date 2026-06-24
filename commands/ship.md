@@ -1,70 +1,47 @@
 ---
 name: "Ship"
 description: 一键构建并发布项目到未来云（测试/生产环境）
-disable-model-invocation: true
 category: Deploy
 tags: [deploy, build, ship, ldc]
 ---
 
-一键构建并发布项目到未来云平台。
+一键构建并发布。`$ARGUMENTS` 为 `test` 或 `prod`，为空则交互选择。
 
-**输入**: `$ARGUMENTS` 可以是环境标识 `test` 或 `prod`。如果为空则交互式选择。
-
-**步骤**
+## 编排流程
 
 1. **前置检查**
-
-   按照 `ldc-deploy` skill 中的前置检查流程：
-   - 检查 `ldc` 是否安装（`which ldc`），未安装则询问是否自动安装
-   - 检查登录状态（`ldc whoami`）
-   - 未通过则按 skill 中的提示处理并中止
+   - `Bash: which ldc` — 未安装提示安装命令
+   - `Bash: ldc whoami` — 未登录提示 `/login`
 
 2. **读取项目配置**
+   - `Read: .claude/deploy.json`
+   - 不存在 → 提示执行 `/init` 并结束
 
-   按照 `ldc-deploy` skill 中的配置读取流程：
-   - 读取当前项目 `.claude/deploy.json`
-   - 不存在则提示 "运行 `/init` 初始化配置" 并中止
+3. **确定部署环境**
+   - `$ARGUMENTS` 包含 `test` → 环境为 test，使用 `apps.test.appId`
+   - `$ARGUMENTS` 包含 `prod` → 环境为 prod，使用 `apps.prod.appId`
+   - `$ARGUMENTS` 为空 → `AskUserQuestion` 选择环境：
+     - 选项：`test`（测试环境）、`prod`（生产环境）
 
-3. **确定目标环境**
+4. **生产环境二次确认**
+   - 环境为 `prod` → `AskUserQuestion`：
+     - 问题："确认要部署到生产环境吗？"
+     - 选项："确认部署"、"取消"
 
-   按照 `ldc-deploy` skill 中的环境处理逻辑：
-   - `$ARGUMENTS` 为 `test` → 测试环境
-   - `$ARGUMENTS` 为 `prod` → 生产环境
-   - `$ARGUMENTS` 为空 → 使用 AskUserQuestion 让用户选择
+5. **选择分支**
+   - `Bash: git branch -r --sort=-committerdate | head -20`
+   - 解析输出，去除 `HEAD` 引用和 `origin/` 前缀，取最近 3 个分支
+   - `AskUserQuestion`：
+     - 问题："选择要部署的分支？"
+     - 选项 1-3：最近 3 个分支（显示分支名 + 最近提交信息）
+     - 选项 4："手动输入分支名"
+   - 如果 `git branch -r` 无输出 → 让用户手动输入分支名
 
-4. **生产环境确认**
+6. **执行构建发布**
+   - test: `Bash: ldc ship <apps.test.appId> -b <branch>`（timeout: 600000）
+   - prod: `Bash: ldc ship <apps.prod.appId> -b <branch>`（timeout: 600000）
+   - 输出构建进度和结果
 
-   如果目标环境为 `prod`，**必须**使用 AskUserQuestion 进行二次确认：
-   - 展示项目名称和目标环境
-   - 用户确认后才继续执行
+## 安全约束
 
-5. **执行 ship**
-
-   根据环境执行对应命令：
-
-   **测试环境：**
-   ```bash
-   ldc ship <test-appId> -b test
-   ```
-   设置 `timeout: 600000`（10 分钟）
-
-   **生产环境：**
-   ```bash
-   ldc ship <prod-appId>
-   ```
-   设置 `timeout: 600000`（10 分钟）
-
-   > **分支处理：** 测试环境默认使用 `-b test`；生产环境不指定分支，透传给 ldc 的交互式 UI 让用户选择。
-
-   其中 `<test-appId>` 和 `<prod-appId>` 从 `.claude/deploy.json` 的 `apps.test.appId` 和 `apps.prod.appId` 读取。
-
-6. **展示结果**
-
-   - 成功：展示构建摘要（项目、环境、分支、commit），并输出未来云管理页链接（从配置中的 `cloudUrl` 读取）
-   - 失败：提示构建失败，输出 cloudUrl 供用户前往未来云查看构建详情
-   - 如需审批（qa_audit=1）：提示等待审批，并告知后续执行 `/deploy publish`
-
-**护栏**
-- 生产环境发布前**必须**二次确认
-- 不执行 `ldc review` 审批操作
-- 不执行 `ldc logout`
+- 不执行 `ldc review` / `ldc logout`
