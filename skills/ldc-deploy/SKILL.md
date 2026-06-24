@@ -80,18 +80,15 @@ metadata:
 2. 未指定 → `AskUserQuestion`：选择 `test` 或 `prod`
 3. 环境为 `prod` 时 → 必须 `AskUserQuestion` 二次确认
 
-### QR PNG 登录模式
+### 登录二维码模式
 
-用于 login 命令，生成 PNG 二维码供 Read 工具内联显示：
+用于 login 命令，后台执行并用 Read 展示完整二维码：
 
-1. `Bash: node <plugin-dir>/scripts/qr-login.mjs`（timeout: 150000）
-2. 解析 stdout 中的 `STATUS:` 和 `QR_PNG:` 行
-3. `STATUS:OK` → 输出 MESSAGE，结束
-4. `STATUS:NEED_QR` → `Read: <QR_PNG 路径>` 显示二维码图片
-5. 等待脚本完成（用户扫码后自动输出 STATUS:OK）
-
-脚本路径：通过 `find ~/.claude/plugins -name qr-login.mjs -path "*/deploy/*"` 定位。
-回退方案：脚本失败时用 `ldc login`，仍失败提示用户手动执行。
+1. `Bash(run_in_background): ldc login 2>&1 | tee /tmp/ldc-login-output.txt`
+2. 等待 3 秒让二维码生成
+3. `Read: /tmp/ldc-login-output.txt` — 展示完整 ASCII 二维码
+4. 等待后台任务完成（用户扫码后自动退出）
+5. `Bash: ldc whoami` 验证登录成功
 
 ### 透传执行模式
 
@@ -109,7 +106,7 @@ metadata:
 |------|---------|
 | `ldc ship` / `ldc build` | 600000 (10min) |
 | `ldc deploy list/publish/rollback` | 120000 (2min) |
-| `ldc login`（qr-login.mjs） | 150000 (2.5min，含 PNG 生成+扫码) |
+| `ldc login` | 120000 (2min，扫码需要时间) |
 | `ldc review` / `ldc whoami` | 60000 (1min) |
 
 ---
